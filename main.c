@@ -23,12 +23,16 @@
 #define Connect_To_GPRS      1
 
 #if Connect_To_GPRS
+
+#define WE_Network          1
+#define Vodafone_Network    0
+
 #define   HTTP  			0
 #define   MQTT  			1
 #endif
 
 #if MQTT
-#define Publish       0
+#define Publish       1
 #define Subscribe     1
 #endif
 
@@ -38,7 +42,7 @@
 
 #define Channel_ID     "996736"                  //Your Channel ID
 #define Write_Key      "RNNN90XKATASUZZG"        //Api Write Key
-#define Data           "6"       				 //Data
+#define Data           "7"       				 //Data
 
 #define DEFAULT_BUFFER_SIZE 100
 char Rec_Data[DEFAULT_BUFFER_SIZE];
@@ -94,16 +98,16 @@ int main()
 	//		{
 	//			_delay_ms(1);
 	//		}
-	_delay_ms(3000);
+	_delay_ms(1000);
 
-	UART_SEND_string("AT+CMGS=\"01115944824\"\r");
+	UART_SEND_string("AT+CMGS=\"01115948824\"\r");
 	//		while(!Check_Respond("\r\nOK\r\n"))
 	//		{
 	//			_delay_ms(1);
 	//		}
-	_delay_ms(3000);
+	_delay_ms(1000);
 
-	UART_SEND_string("Hello From Embeddedfab");
+	UART_SEND_string("Hello From GSM Module");
 	UART_SendChar(0x1A);
 	//		while(!Check_Respond("\r\nOK\r\n"))
 	//		{
@@ -117,6 +121,13 @@ int main()
 
 
 #if Connect_To_GPRS
+
+
+	UART_SEND_string("AT+CREG?\r");
+
+	_delay_ms(3000);
+
+
 
 	UART_SEND_string("AT+CIPSHUT\r");
 	//	while(!Check_Respond("\r\nSHUT OK\r\n"))
@@ -147,12 +158,13 @@ int main()
 	//	}
 	_delay_ms(3000);
 
-	UART_SEND_string("AT+CREG?\r");
+#if WE_Network
+	UART_SEND_string("AT+CSTT=\"internet.TE.eg\",\"\",\"\"\r");
+#endif
 
-	_delay_ms(3000);
-
-
+#if Vodafone_Network
 	UART_SEND_string("AT+CSTT=\"internet.vodafone.net\",\"internet\",\"internet\"\r");
+#endif
 	//	while(!Check_Respond("\r\nOK\r\n"))
 	//	{
 	//		_delay_ms(1);
@@ -269,6 +281,8 @@ int main()
 
 #if Publish
 
+
+
 	UART_SEND_string("AT+CIPSEND\r");
 //	while(!Check_Respond("\r\nOK\r\n> "))
 //	{
@@ -290,6 +304,7 @@ int main()
 
 
 	UART_SendChar(0x1A);
+	_delay_ms(5000);
 
 
 #endif
@@ -315,6 +330,28 @@ int main()
 	UART_SendChar(0x00);
 
 	UART_SendChar(0x1A);
+
+// Ping to Keep alive
+		while(1)
+		{
+
+		UART_SEND_string("AT+CIPSEND\r");
+	//	while(!Check_Respond("\r\nOK\r\n> "))
+	//	{
+	//		_delay_ms(1);
+	//	}
+		_delay_ms(3000);
+
+		UART_SendChar(0xC0);
+		UART_SendChar(0x00);
+
+		UART_SendChar(0x1A);
+		_delay_ms(5000);
+		_delay_ms(5000);
+
+
+		}
+
 
 
 
